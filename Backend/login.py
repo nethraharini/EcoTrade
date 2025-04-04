@@ -70,20 +70,50 @@ def signup():
     else:
         flash('Invalid role.', 'error')
 
-    return redirect('/')
+    return redirect('/home')
+
+@app.route('/home')
+def home():
+    if 'username' in session:
+        return render_template('home.html', username=session['username'], role=session['role'])
+    else:
+        flash('Please log in first.', 'error')
+        return redirect('/')
+
+
 
 # Dashboard routes
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    return f"Hello Admin: {session.get('username')}"
+    if 'username' in session:
+        return render_template('home.html', username=session['username'])
+    return redirect('/')
 
 @app.route('/buyer_dashboard')
 def buyer_dashboard():
-    return f"Hello Buyer: {session.get('username')}"
+    if 'username' in session:
+        return render_template('home.html', username=session['username'])
+
+    return redirect('/')
 
 @app.route('/seller_dashboard')
 def seller_dashboard():
-    return f"Hello Seller: {session.get('username')}"
+    if 'username' in session:
+        return render_template('home.html', username=session['username'])
+    return redirect('/')
+
+@app.route('/marketplace')
+def marketplace():
+    return render_template('marketplace.html')
+
+@app.route('/visual')
+def visual():
+    return render_template('visual.html')  # or however you're handling that page
+
+
+@app.route('/tn_visualization')
+def tn_visualization():
+    return render_template('TN_visualization.html')
 
 # Run the app
 if __name__ == '__main__':
