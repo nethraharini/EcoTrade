@@ -104,16 +104,32 @@ def seller_dashboard():
 
 @app.route('/marketplace')
 def marketplace():
-    return render_template('marketplace.html')
+    if 'username' in session:
+        return render_template('marketplace.html', username=session['username'])
+    else:
+        flash('Please log in first.', 'error')
+        return redirect('/')
 
 @app.route('/visual')
 def visual():
-    return render_template('visual.html')  # or however you're handling that page
+    if 'username' in session:
+        return render_template('visual.html', username=session['username'])
+    else:
+        flash('Please log in first.', 'error')
+        return redirect('/')
+
+
+@app.route('/login')
+def login_():
+    return render_template('login.html')
 
 
 @app.route('/tn_visualization')
 def tn_visualization():
     return render_template('TN_visualization.html')
+
+
+
 
 # Run the app
 if __name__ == '__main__':

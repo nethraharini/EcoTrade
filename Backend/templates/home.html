@@ -84,7 +84,9 @@
                         <a class="nav-link" href="{{ url_for('marketplace') }}">Marketplace</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="visual.html">Visual</a>
+                       
+                        <a class="nav-link" href="{{ url_for('visual') }}">Visual</a>
+
 
                     </li>
                     <li class="nav-item">
@@ -230,5 +232,23 @@
             setActiveNav();
         });
     </script>
+
+<script>
+    const authButton = document.getElementById('authButton');
+    const isLoggedIn = localStorage.getItem('ecoToken');
+  
+    if (isLoggedIn) {
+      authButton.textContent = 'Logout';
+      authButton.href = '#';
+      authButton.onclick = () => {
+        localStorage.removeItem('ecoToken');
+        window.location.href = '{{ url_for("login") }}';  // Redirect to login after logout
+      };
+    } else {
+      authButton.textContent = 'Login';
+      authButton.href = '{{ url_for("login") }}';
+    }
+  </script>
+  
 </body>
 </html>

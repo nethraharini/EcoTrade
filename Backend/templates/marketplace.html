@@ -100,13 +100,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.html">Home</a>
+                        <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="marketplace.html">Marketplace</a>
+                        <a class="nav-link" href="{{ url_for('marketplace') }}">Marketplace</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="visual.html">Visual</a>
+                        <a class="nav-link" href="{{ url_for('visual') }}">Visual</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="about.html">About Us</a>
@@ -118,7 +118,7 @@
                         <a class="nav-link" href="cart.html">Your Cart</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light" href="login.html" id="authButton">Login</a>
+                        <a id="authButton" class="btn btn-outline-primary" href="{{ url_for('login') }}">Login</a>
                     </li>
                 </ul>
             </div>
@@ -794,5 +794,22 @@
             filterAndPaginate();
         });
     </script>
+    <script>
+        const authButton = document.getElementById('authButton');
+        const isLoggedIn = localStorage.getItem('ecoToken');
+      
+        if (isLoggedIn) {
+          authButton.textContent = 'Logout';
+          authButton.href = '#';
+          authButton.onclick = () => {
+            localStorage.removeItem('ecoToken');
+            window.location.href = '{{ url_for("login") }}';  // Redirect to login after logout
+          };
+        } else {
+          authButton.textContent = 'Login';
+          authButton.href = '{{ url_for("login") }}';
+        }
+      </script>
+      
 </body>
 </html>
