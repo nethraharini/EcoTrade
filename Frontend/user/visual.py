@@ -1,36 +1,60 @@
+from flask import Flask, render_template, send_file
 import folium
 import geopandas as gpd
+import pandas as pd
 
-# Load GeoJSON file
-geojson_path = "TN.geojson"  # Make sure this file contains only TN districts
+app = Flask(__name__)
+
+# Load GeoJSON
+geojson_path = r"C:\Users\nethr\OneDrive\Desktop\ET\EcoTrade\Frontend\user\TN.geojson"
 gdf = gpd.read_file(geojson_path)
+district_field = "district"  # Ensure this matches the column in your GeoJSON
 
-# Print available fields to verify correct district column
-print(gdf.columns)
+# Load CSV data
+csv_path = r"C:\Users\nethr\OneDrive\Desktop\ET\EcoTrade\Frontend\user\TN.csv.csv"  # Make sure the CSV is structured correctly
+df = pd.read_csv(csv_path)
 
-# Use the correct district name field (update if different in your file)
-district_field = "district"
+# Function to generate the folium map
+def generate_map(material):
+    # Create base TN map
+    minx, miny, maxx, maxy = gdf.total_bounds
+    m = folium.Map(location=[(miny + maxy) / 2, (minx + maxx) / 2], zoom_start=7, tiles=None)
+    folium.TileLayer("cartodbpositron", opacity=0).add_to(m)  # Transparent background
+    
+    # Filter dataset based on selected material
+    material_data = df[df["Material"] == material]
+    district_colors = {row["District"]: "red" for _, row in material_data.iterrows()}  # Customize colors
+    
+    # Add districts
+    folium.GeoJson(
+        gdf,
+        name="Tamil Nadu Districts",
+        style_function=lambda feature: {
+            "fillColor": district_colors.get(feature["properties"][district_field], "transparent"),
+            "color": "black",
+            "weight": 1.5,
+            "fillOpacity": 0.5 if feature["properties"][district_field] in district_colors else 0.1
+        },
+        tooltip=folium.GeoJsonTooltip(fields=[district_field], aliases=["District: "])
+    ).add_to(m)
+    
+    return m
 
-# Find Tamil Nadu's bounding box (so we only show TN)
-minx, miny, maxx, maxy = gdf.total_bounds
-m = folium.Map(location=[(miny + maxy) / 2, (minx + maxx) / 2], zoom_start=7, tiles=None)
+# Route to serve the base HTML page
+@app.route("/")
+def home():
+    return render_template("T.html")  # Keep this page as is
 
-# Add a white background to remove the global map
-folium.TileLayer("cartodbpositron", opacity=0).add_to(m)  # Makes background empty
+# Route to update the map
+@app.route("/update_map/<material>")
+def update_map(material):
+    print(f"Updating map for material: {material}")
+    
+    # Generate map only (not a full HTML page)
+    map_obj = generate_map(material)
+    map_obj.save("static/map.html")  # Save updated map
 
-# Add district boundaries (Only Tamil Nadu, rest removed)
-folium.GeoJson(
-    gdf,
-    name="Tamil Nadu Districts",
-    style_function=lambda feature: {
-        "fillColor": "transparent",  # Keep TN transparent
-        "color": "black",  # Border color
-        "weight": 1.5,  # Border thickness
-        "fillOpacity": 0.1  # Slight visibility of TN area
-    },
-    tooltip=folium.GeoJsonTooltip(fields=[district_field], aliases=["District: "])  # Hover to show district name
-).add_to(m)
+    return "Map updated", 200  # Return status only (no full HTML)
 
-# Save the map
-m.save("visual.html")
-print("Tamil Nadu map saved as TN_visualization.html")
+if __name__ == "__main__":
+    app.run(debug=True)

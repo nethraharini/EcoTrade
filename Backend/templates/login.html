@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Role-Based Access Portal</title>
     <style>
+        /* ... [exact same style from your original code] ... */
         * {
             margin: 0;
             padding: 0;
@@ -82,7 +83,6 @@
             margin-bottom: 30px;
             color: #1c1e21;
             font-size: 24px;
-            text-align: center;
         }
 
         .form-group {
@@ -124,16 +124,7 @@
 
         .flash {
             margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .flash.success {
-            color: green;
-        }
-
-        .flash.error {
-            color: red;
+            color: #e53935;
         }
     </style>
 </head>
@@ -155,17 +146,9 @@
 
     <div class="form-container">
         <div class="form-wrapper">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-
-            <div class="form login-form active">
+               <div class="form login-form active">
                 <h1>Admin Login</h1>
-                <form method="POST" action="/login">
+                <form id="loginForm" method="POST" action="/login">
                     <input type="hidden" name="role" id="loginRole" value="admin">
                     <div class="form-group">
                         <input type="text" name="username" placeholder="Username" required>
@@ -182,7 +165,7 @@
 
             <div class="form signup-form">
                 <h1>Admin Sign Up</h1>
-                <form method="POST" action="/signup">
+                <form id="signupForm" method="POST" action="/signup">
                     <input type="hidden" name="role" id="signupRole" value="admin">
                     <div class="form-group">
                         <input type="email" name="email" placeholder="Email" required>
@@ -208,10 +191,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const roleCards = document.querySelectorAll('.role-card');
+            const roleTitles = document.querySelectorAll('.form h1');
             const loginRoleInput = document.getElementById('loginRole');
             const signupRoleInput = document.getElementById('signupRole');
-            const loginForm = document.querySelector('.login-form');
-            const signupForm = document.querySelector('.signup-form');
 
             roleCards.forEach(card => {
                 card.addEventListener('click', () => {
@@ -219,19 +201,21 @@
                     card.classList.add('active');
 
                     const role = card.dataset.role;
+
+                    roleTitles.forEach(title => {
+                        title.textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} ${title.textContent.split(' ')[1]}`;
+                    });
+
                     loginRoleInput.value = role;
                     signupRoleInput.value = role;
-
-                    loginForm.querySelector('h1').textContent = `${capitalize(role)} Login`;
-                    signupForm.querySelector('h1').textContent = `${capitalize(role)} Sign Up`;
                 });
             });
 
-            function capitalize(str) {
-                return str.charAt(0).toUpperCase() + str.slice(1);
-            }
+            const toggleLinks = document.querySelectorAll('.toggle-form');
+            const loginForm = document.querySelector('.login-form');
+            const signupForm = document.querySelector('.signup-form');
 
-            document.querySelectorAll('.toggle-form').forEach(link => {
+            toggleLinks.forEach(link => {
                 link.addEventListener('click', () => {
                     loginForm.classList.toggle('active');
                     signupForm.classList.toggle('active');
