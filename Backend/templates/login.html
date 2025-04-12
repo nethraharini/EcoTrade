@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Role-Based Access Portal</title>
     <style>
-        /* ... [exact same style from your original code] ... */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
@@ -19,60 +18,90 @@
             background: #f8f9fa;
         }
 
+        /* Role Selection Panel */
         .role-container {
-            width: 40%;
-            padding: 40px;
-            background: white;
-            border-right: 1px solid #e0e0e0;
+            width: 35%;
+            padding: 2.5rem;
+            background: #ffffff;
+            border-right: 1px solid #e9ecef;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.02);
         }
 
         .role-card {
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .role-card:hover {
-            border-color: #1877f2;
-            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.1);
+            transform: translateY(-2px);
+            border-color: #4dabf7;
+            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.1);
         }
 
         .role-card.active {
-            border-color: #1877f2;
-            background: #f0f6ff;
+            border-color: #339af0;
+            background: #f8fbff;
+            padding-left: 2.5rem;
+        }
+
+        .role-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #339af0;
         }
 
         .role-card h2 {
-            color: #1c1e21;
-            margin-bottom: 10px;
+            color: #1a1b1e;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
         .role-card p {
-            color: #65676b;
+            color: #5c5f66;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
+        /* Form Container */
         .form-container {
-            width: 60%;
-            padding: 40px;
+            width: 65%;
+            padding: 4rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #fbfdff;
         }
 
         .form-wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
+            animation: fadeIn 0.4s ease-out;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Forms */
         .form {
             display: none;
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
         }
 
         .form.active {
@@ -80,51 +109,118 @@
         }
 
         .form h1 {
-            margin-bottom: 30px;
-            color: #1c1e21;
-            font-size: 24px;
+            margin-bottom: 2rem;
+            color: #1a1b1e;
+            font-size: 1.75rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .form h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: #339af0;
+            border-radius: 2px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 0.875rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #74c0fc;
+            box-shadow: 0 0 0 3px rgba(116, 192, 252, 0.15);
+        }
+
+        input::placeholder {
+            color: #868e96;
         }
 
         button[type="submit"] {
             width: 100%;
-            padding: 12px;
-            background: #1877f2;
+            padding: 1rem;
+            background: #339af0;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 15px;
+            transition: all 0.2s ease;
         }
 
+        button[type="submit"]:hover {
+            background: #228be6;
+            transform: translateY(-1px);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* Form Toggle */
         .form-toggle {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 1.5rem;
+            color: #5c5f66;
         }
 
         .form-toggle a {
-            color: #1877f2;
+            color: #339af0;
             text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            transition: all 0.2s ease;
         }
 
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Flash Messages */
         .flash {
-            margin-bottom: 15px;
-            color: #e53935;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #fff3bf;
+            color: #5c5f66;
+            border-radius: 8px;
+            border: 1px solid #ffe066;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .role-container, .form-container {
+                width: 100%;
+                padding: 2rem;
+            }
+
+            .role-container {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .form-wrapper {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -138,15 +234,15 @@
             <h2>For Buyers</h2>
             <p>Access marketplace and purchase products</p>
         </div>
-        <div class="role-card" data-role="seller">
-            <h2>For Sellers</h2>
+        <div class="role-card" data-role="producers">
+            <h2>For Producers</h2>
             <p>Manage your products and sales</p>
         </div>
     </div>
 
     <div class="form-container">
         <div class="form-wrapper">
-               <div class="form login-form active">
+            <div class="form login-form active">
                 <h1>Admin Login</h1>
                 <form id="loginForm" method="POST" action="/login">
                     <input type="hidden" name="role" id="loginRole" value="admin">
@@ -195,31 +291,43 @@
             const loginRoleInput = document.getElementById('loginRole');
             const signupRoleInput = document.getElementById('signupRole');
 
+            // Role selection handler
             roleCards.forEach(card => {
                 card.addEventListener('click', () => {
                     roleCards.forEach(c => c.classList.remove('active'));
                     card.classList.add('active');
-
                     const role = card.dataset.role;
 
+                    // Update form titles
                     roleTitles.forEach(title => {
-                        title.textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} ${title.textContent.split(' ')[1]}`;
+                        const action = title.textContent.split(' ')[1];
+                        title.textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} ${action}`;
+                        title.style.animation = 'none';
+                        void title.offsetHeight; // Trigger reflow
+                        title.style.animation = 'fadeIn 0.4s ease-out';
                     });
 
+                    // Update hidden role inputs
                     loginRoleInput.value = role;
                     signupRoleInput.value = role;
                 });
             });
 
+            // Form toggle handler
             const toggleLinks = document.querySelectorAll('.toggle-form');
             const loginForm = document.querySelector('.login-form');
             const signupForm = document.querySelector('.signup-form');
 
+            const toggleForms = () => {
+                loginForm.classList.toggle('active');
+                signupForm.classList.toggle('active');
+                document.querySelector('.form-wrapper').style.animation = 'none';
+                void document.querySelector('.form-wrapper').offsetHeight;
+                document.querySelector('.form-wrapper').style.animation = 'fadeIn 0.4s ease-out';
+            };
+
             toggleLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    loginForm.classList.toggle('active');
-                    signupForm.classList.toggle('active');
-                });
+                link.addEventListener('click', toggleForms);
             });
         });
     </script>

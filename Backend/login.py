@@ -14,7 +14,7 @@ mongo = PyMongo(app)
 collections = {
     'admin': mongo.db.admins,
     'buyer': mongo.db.buyers,
-    'seller': mongo.db.sellers
+    'producers': mongo.db.producers
 }
 
 # Home route

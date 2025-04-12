@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--light);
         }
 
         .nav-container {
@@ -24,22 +24,39 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
         .nav-link {
             color: var(--light) !important;
             transition: all 0.3s ease;
             margin: 0 15px;
+            position: relative;
         }
 
         .nav-link.active {
             color: var(--accent) !important;
-            border-bottom: 2px solid var(--accent);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
         }
 
         .filter-sidebar {
-            background: var(--light);
+            background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
         }
 
         .product-card {
@@ -47,6 +64,8 @@
             border-radius: 10px;
             transition: transform 0.3s ease;
             margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
         .product-card:hover {
@@ -61,17 +80,14 @@
             transition: all 0.2s ease;
         }
 
-        .material-option:hover {
-            background: var(--secondary);
-            color: white;
+        .active-filter {
+            background: var(--secondary) !important;
+            color: white !important;
+            border-color: var(--secondary);
         }
 
         .price-range {
             width: 100%;
-        }
-
-        .pagination {
-            margin-top: 30px;
         }
 
         .status-badge {
@@ -81,19 +97,31 @@
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.8rem;
+            z-index: 1;
         }
 
         .status-available { background: #28a745; color: white; }
         .status-ongoing { background: #ffc107; color: black; }
         .status-soon { background: #17a2b8; color: white; }
         .status-closed { background: #dc3545; color: white; }
+
+        .card-title {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .material-badge {
+            background: var(--primary);
+            color: white;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Fixed navbar structure -->
     <nav class="navbar navbar-expand-lg navbar-dark nav-container">
         <div class="container">
-            <a class="navbar-brand" href="home.html">WasteLinkIt
-            </a>
+            <a class="navbar-brand" href="{{ url_for('home') }}">WasteLinkIt</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -118,16 +146,16 @@
                         <a class="nav-link" href="cart.html">Your Cart</a>
                     </li>
                     <li class="nav-item">
-                        <a id="authButton" class="btn btn-outline-primary" href="{{ url_for('login') }}">Login</a>
+                        <a id="authButton" class="btn btn-outline-light" href="{{ url_for('login') }}">Login</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    
 
     <main class="container my-5">
         <div class="row">
+            <!-- Corrected column sizing -->
             <div class="col-lg-3 mb-4">
                 <div class="filter-sidebar">
                     <h4>Filters</h4>
@@ -139,40 +167,43 @@
                         <input type="text" class="form-control" id="locationInput" placeholder="Enter location">
                     </div>
                     <div class="mb-4">
-                        <h6>Material Type</h6>
+                        <h6>Plastic Type</h6>
                         <div class="list-group">
-                            <div class="material-option active-filter" data-type="all">All Materials</div>
-                            <div class="material-option" data-type="fibre">Fibre</div>
-                            <div class="material-option" data-type="metal">Metal</div>
-                            <div class="material-option" data-type="plastic">Plastic</div>
-                            <div class="material-option" data-type="rubber">Rubber</div>
+                            <button class="list-group-item list-group-item-action active-filter" data-type="all">All Plastics</button>
+                            <button class="list-group-item list-group-item-action" data-type="PET">PET</button>
+                            <button class="list-group-item list-group-item-action" data-type="LDPE">LDPE</button>
+                            <button class="list-group-item list-group-item-action" data-type="PVC">PVC</button>
+                            <button class="list-group-item list-group-item-action" data-type="HDPE">HDPE</button>
+                            <button class="list-group-item list-group-item-action" data-type="PS">PS</button>
+                            <button class="list-group-item list-group-item-action" data-type="PP">PP</button>
                         </div>
                     </div>
                     <div class="mb-4">
                         <h6>Price Range</h6>
-                        <input type="range" class="price-range" id="priceRange" min="0" max="5" step="0.1" value="5">
-                        <span id="priceValue">$0 - $5</span>
+                        <input type="range" class="price-range" id="priceRange" min="0" max="10" step="0.1" value="10">
+                        <span id="priceValue">$0 - $10</span>
                     </div>
                 </div>
-            </div>
+                    <!-- ... (keep filter content same) ... -->
+                </div>
 
-            <div class="col-md-9">
+            <div class="col-lg-9">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <h1>Waste Marketplace</h1>
-                        <p class="lead">Find and trade recyclable materials</p>
+                        <h1>Plastic Marketplace</h1>
+                        <p class="lead">Buy and sell recycled plastic materials</p>
                     </div>
                 </div>
 
                 <div class="row" id="listings">
-                    <!-- Sample Listings - Add all your listings here -->
-                    <div class="col-md-4 listing" data-price="1.20" data-category="fibre" data-location="Texas" data-tons="15" data-status="available">
-                        <div class="card listing-card h-100">
+                    <!-- PET Listings -->
+                    <div class="col-md-4 listing" data-price="1.20" data-category="PET" data-location="Texas" data-tons="15" data-status="available">
+                        <div class="card product-card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Cotton</h5>
-                                <p class="card-text">Textile production surplus</p>
+                                <h5 class="card-title">PET Flakes</h5>
+                                <p class="card-text">Clear recycled PET flakes</p>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge bg-info">Fibre</span>
+                                    <span class="badge badge-PET material-badge">PET</span>
                                     <div class="text-end">
                                         <span class="text-success">$1.20/kg</span>
                                         <br>
@@ -181,472 +212,358 @@
                                 </div>
                                 <div class="status-badge status-available">Available</div>
                                 <div class="d-grid gap-2">
-                                    <button class="btn btn-primary btn-prebook">Prebook</button>
+                                    <button class="btn btn-primary">Prebook</button>
                                     <button class="btn btn-success">Buy Now</button>
                                 </div>
                                 <small class="text-muted d-block mt-2">Location: Texas</small>
                             </div>
                         </div>
                     </div>
+
+                    <!-- HDPE Listing -->
+<div class="col-md-4 listing" data-price="1.05" data-category="HDPE" data-location="New York" data-tons="10" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">HDPE Granules</h5>
+            <p class="card-text">Premium grade HDPE recycled granules</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-HDPE material-badge">HDPE</span>
+                <div class="text-end">
+                    <span class="text-success">$1.05/kg</span>
+                    <br>
+                    <span class="stock-info">10 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: New York</small>
+        </div>
+    </div>
+</div>
+
+<!-- PVC Listing -->
+<div class="col-md-4 listing" data-price="0.85" data-category="PVC" data-location="Florida" data-tons="12" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PVC Granules</h5>
+            <p class="card-text">Flexible PVC recycled material</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PVC material-badge">PVC</span>
+                <div class="text-end">
+                    <span class="text-success">$0.85/kg</span>
+                    <br>
+                    <span class="stock-info">12 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Florida</small>
+        </div>
+    </div>
+</div>
+
+<!-- PP Listing -->
+<div class="col-md-4 listing" data-price="1.00" data-category="PP" data-location="Illinois" data-tons="18" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PP Pellets</h5>
+            <p class="card-text">Recycled Polypropylene pellets for molding</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PP material-badge">PP</span>
+                <div class="text-end">
+                    <span class="text-success">$1.00/kg</span>
+                    <br>
+                    <span class="stock-info">18 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Illinois</small>
+        </div>
+    </div>
+</div>
+
+<!-- PET Bottles Listing -->
+<div class="col-md-4 listing" data-price="0.75" data-category="PET" data-location="Arizona" data-tons="20" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PET Bottles (Baled)</h5>
+            <p class="card-text">Post-consumer PET bottles baled and sorted</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PET material-badge">PET</span>
+                <div class="text-end">
+                    <span class="text-success">$0.75/kg</span>
+                    <br>
+                    <span class="stock-info">20 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Arizona</small>
+        </div>
+    </div>
+</div>
+
+<!-- LDPE Listing -->
+<div class="col-md-4 listing" data-price="0.88" data-category="LDPE" data-location="Georgia" data-tons="10" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">LDPE Film Rolls</h5>
+            <p class="card-text">Recycled LDPE film for packaging use</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-LDPE material-badge">LDPE</span>
+                <div class="text-end">
+                    <span class="text-success">$0.88/kg</span>
+                    <br>
+                    <span class="stock-info">10 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Georgia</small>
+        </div>
+    </div>
+</div>
+
+<!-- LDPE Listing -->
+<div class="col-md-4 listing" data-price="0.92" data-category="LDPE" data-location="New York" data-tons="14" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">LDPE Granules</h5>
+            <p class="card-text">Transparent recycled LDPE granules</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-LDPE material-badge">LDPE</span>
+                <div class="text-end">
+                    <span class="text-success">$0.92/kg</span>
+                    <br>
+                    <span class="stock-info">14 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: New York</small>
+        </div>
+    </div>
+</div>
+
+
+<!-- HDPE Listing -->
+<div class="col-md-4 listing" data-price="1.05" data-category="HDPE" data-location="Ohio" data-tons="13" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">HDPE Milk Bottles</h5>
+            <p class="card-text">Clean white HDPE from post-consumer milk jugs</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-HDPE material-badge">HDPE</span>
+                <div class="text-end">
+                    <span class="text-success">$1.05/kg</span>
+                    <br>
+                    <span class="stock-info">13 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Ohio</small>
+        </div>
+    </div>
+</div>
+
+
+<!-- HDPE Listing -->
+<div class="col-md-4 listing" data-price="1.10" data-category="HDPE" data-location="Colorado" data-tons="11" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">HDPE Granules</h5>
+            <p class="card-text">High-density black recycled HDPE granules</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-HDPE material-badge">HDPE</span>
+                <div class="text-end">
+                    <span class="text-success">$1.10/kg</span>
+                    <br>
+                    <span class="stock-info">11 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Colorado</small>
+        </div>
+    </div>
+</div>
+
+<!-- PP Listing -->
+<div class="col-md-4 listing" data-price="0.97" data-category="PP" data-location="Missouri" data-tons="9" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PP Black Pellets</h5>
+            <p class="card-text">Injection grade black recycled PP</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PP material-badge">PP</span>
+                <div class="text-end">
+                    <span class="text-success">$0.97/kg</span>
+                    <br>
+                    <span class="stock-info">9 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Missouri</small>
+        </div>
+    </div>
+</div>
+
+<!-- PP Listing -->
+<div class="col-md-4 listing" data-price="1.02" data-category="PP" data-location="Oregon" data-tons="16" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PP White Pellets</h5>
+            <p class="card-text">Recycled white polypropylene pellets</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PP material-badge">PP</span>
+                <div class="text-end">
+                    <span class="text-success">$1.02/kg</span>
+                    <br>
+                    <span class="stock-info">16 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Oregon</small>
+        </div>
+    </div>
+</div>
+
+<!-- PS Listing -->
+<div class="col-md-4 listing" data-price="0.93" data-category="PS" data-location="Washington" data-tons="6" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PS Pellets</h5>
+            <p class="card-text">Recycled polystyrene pellets for molding</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PS material-badge">PS</span>
+                <div class="text-end">
+                    <span class="text-success">$0.93/kg</span>
+                    <br>
+                    <span class="stock-info">6 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Washington</small>
+        </div>
+    </div>
+</div>
+
+<!-- PS Listing -->
+<div class="col-md-4 listing" data-price="0.89" data-category="PS" data-location="Pennsylvania" data-tons="8" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PS Clear Regrind</h5>
+            <p class="card-text">Transparent PS from industrial scrap</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PS material-badge">PS</span>
+                <div class="text-end">
+                    <span class="text-success">$0.89/kg</span>
+                    <br>
+                    <span class="stock-info">8 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Pennsylvania</small>
+        </div>
+    </div>
+</div>
+
+
+<!-- PS Listing -->
+<div class="col-md-4 listing" data-price="0.90" data-category="PS" data-location="Nevada" data-tons="9" data-status="available">
+    <div class="card product-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">PS Regrind</h5>
+            <p class="card-text">Clean Polystyrene regrind, sorted and ready</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-PS material-badge">PS</span>
+                <div class="text-end">
+                    <span class="text-success">$0.90/kg</span>
+                    <br>
+                    <span class="stock-info">9 Tons Available</span>
+                </div>
+            </div>
+            <div class="status-badge status-available">Available</div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary">Prebook</button>
+                <button class="btn btn-success">Buy Now</button>
+            </div>
+            <small class="text-muted d-block mt-2">Location: Nevada</small>
+        </div>
+    </div>
+</div>
+
+
+
+                    <!-- LDPE Listing -->
+                    <div class="col-md-4 listing" data-price="0.95" data-category="LDPE" data-location="California" data-tons="8" data-status="available">
+                        <div class="card product-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">LDPE Pellets</h5>
+                                <p class="card-text">High-quality recycled LDPE</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge badge-LDPE material-badge">LDPE</span>
+                                    <div class="text-end">
+                                        <span class="text-success">$0.95/kg</span>
+                                        <br>
+                                        <span class="stock-info">8 Tons Available</span>
+                                    </div>
+                                </div>
+                                <div class="status-badge status-available">Available</div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary">Prebook</button>
+                                    <button class="btn btn-success">Buy Now</button>
+                                </div>
+                                <small class="text-muted d-block mt-2">Location: California</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add more listings for PVC, HDPE, PS, PP following same pattern -->
                     
-
-
-                    <!-- Add all other listings following the same structure -->
-                    <!-- Make sure each listing has correct data attributes -->
                 </div>
-                <div class="col-md-4 listing" data-price="0.95" data-category="fibre" data-location="India" data-tons="8" data-status="ongoing">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Jute</h5>
-                            <p class="card-text">Natural fiber bundles</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-info">Fibre</span>
-                                <div class="text-end">
-                                    <span class="text-success">$0.95/kg</span>
-                                    <br>
-                                    <span class="stock-info">8 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-ongoing">Ongoing</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: India</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 listing" data-price="2.10" data-category="fibre" data-location="Australia" data-tons="0" data-status="soon">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Wool</h5>
-                            <p class="card-text">Raw wool fibers</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-info">Fibre</span>
-                                <div class="text-end">
-                                    <span class="text-success">$2.10/kg</span>
-                                    <br>
-                                    <span class="stock-info">Available Soon</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-soon">Available Soon</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success" disabled>Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Australia</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 listing" data-price="3.50" data-category="fibre" data-location="Italy" data-tons="25" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Silk</h5>
-                            <p class="card-text">Premium silk remnants</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-info">Fibre</span>
-                                <div class="text-end">
-                                    <span class="text-success">$3.50/kg</span>
-                                    <br>
-                                    <span class="stock-info">25 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Italy</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 listing" data-price="0.75" data-category="fibre" data-location="Canada" data-tons="0" data-status="closed">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Hemp</h5>
-                            <p class="card-text">Industrial hemp fibers</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-info">Fibre</span>
-                                <div class="text-end">
-                                    <span class="text-success">$0.75/kg</span>
-                                    <br>
-                                    <span class="stock-info">Out of Stock</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-closed">Closed</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success" disabled>Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Canada</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Metal Materials -->
-                <!-- Add similar structure for all 7 metal types -->
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Iron</h5>
-                            <p class="card-text">Industrial iron scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$0.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Pittsburgh</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Steel</h5>
-                            <p class="card-text">Industrial Steel scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$20.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Pittsburgh</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Aluminium</h5>
-                            <p class="card-text">Industrial Aluminium scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$20.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Chennai</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Copper</h5>
-                            <p class="card-text">Industrial Copper scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$20.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Tiruppur</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Brass</h5>
-                            <p class="card-text">Industrial Brass scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Lead</h5>
-                            <p class="card-text">Industrial Lead scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="metal" data-location="Pittsburgh" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Zinc</h5>
-                            <p class="card-text">Industrial Zinc scraps</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Metal</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">PET</h5>
-                            <p class="card-text">Polyethylene terephthalate</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">HDPE</h5>
-                            <p class="card-text">High Density Poly Ethylene</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: UK</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">PVC</h5>
-                            <p class="card-text">Polyvinyl chloride</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">LDPE</h5>
-                            <p class="card-text">Low-density polyethylene</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">PP</h5>
-                            <p class="card-text">polypropylene, periodic paralysis</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 listing" data-price="0.80" data-category="plastic" data-location="Coimbatore" data-tons="50" data-status="available">
-                    <div class="card listing-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">PS</h5>
-                            <p class="card-text">Polystyrene</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-secondary">Plastic</span>
-                                <div class="text-end">
-                                    <span class="text-success">$21.80/kg</span>
-                                    <br>
-                                    <span class="stock-info">50 Tons Available</span>
-                                </div>
-                            </div>
-                            <div class="status-badge status-available">Available</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-prebook" data-bs-toggle="modal" data-bs-target="#prebookModal">Prebook</button>
-                                <button class="btn btn-success">Buy Now</button>
-                            </div>
-                            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Rubber Materials (Corrected) -->
-<div class="col-md-4 listing" data-price="1.80" data-category="rubber" data-location="Coimbatore" data-tons="50" data-status="available">
-    <div class="card listing-card h-100">
-        <div class="card-body">
-            <h5 class="card-title">Natural Rubber</h5>
-            <p class="card-text">Natural rubber scraps</p>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge bg-warning">Rubber</span> <!-- Changed badge color -->
-                <div class="text-end">
-                    <span class="text-success">$2.80/kg</span>
-                    <br>
-                    <span class="stock-info">50 Tons Available</span>
-                </div>
-            </div>
-            <div class="status-badge status-available">Available</div>
-            <div class="d-grid gap-2">
-                <button class="btn btn-prebook">Prebook</button>
-                <button class="btn btn-success">Buy Now</button>
-            </div>
-            <small class="text-muted d-block mt-2">Location: Coimbatore</small>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-4 listing" data-price="1.50" data-category="rubber" data-location="Mumbai" data-tons="30" data-status="available">
-    <div class="card listing-card h-100">
-        <div class="card-body">
-            <h5 class="card-title">Synthetic Rubber</h5>
-            <p class="card-text">Industrial synthetic rubber</p>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge bg-warning">Rubber</span>
-                <div class="text-end">
-                    <span class="text-success">$1.50/kg</span>
-                    <br>
-                    <span class="stock-info">30 Tons Available</span>
-                </div>
-            </div>
-            <div class="status-badge status-available">Available</div>
-            <div class="d-grid gap-2">
-                <button class="btn btn-prebook">Prebook</button>
-                <button class="btn btn-success">Buy Now</button>
-            </div>
-            <small class="text-muted d-block mt-2">Location: Mumbai</small>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-4 listing" data-price="1.20" data-category="rubber" data-location="Delhi" data-tons="0" data-status="soon">
-    <div class="card listing-card h-100">
-        <div class="card-body">
-            <h5 class="card-title">Reclaimed Rubber</h5>
-            <p class="card-text">Recycled rubber material</p>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge bg-warning">Rubber</span>
-                <div class="text-end">
-                    <span class="text-success">$1.20/kg</span>
-                    <br>
-                    <span class="stock-info">Available Soon</span>
-                </div>
-            </div>
-            <div class="status-badge status-soon">Coming Soon</div>
-            <div class="d-grid gap-2">
-                <button class="btn btn-prebook">Prebook</button>
-                <button class="btn btn-success" disabled>Buy Now</button>
-            </div>
-            <small class="text-muted d-block mt-2">Location: Delhi</small>
-        </div>
-    </div>
-</div>
-                
-                
 
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center" id="pagination">
@@ -654,45 +571,37 @@
                 </nav>
             </div>
         </div>
+                <!-- ... (keep main content same) ... -->
     </main>
-
-    <!-- Modals -->
-    <div class="modal fade" id="prebookModal" tabindex="-1">
-        <!-- Prebook Modal Content -->
-    </div>
-
-    <div class="modal fade" id="buyNowModal" tabindex="-1">
-        <!-- Buy Now Modal Content -->
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const itemsPerPage = 6;
             let currentPage = 1;
-            let activeFilter = 'all';
-            
+            const listings = document.querySelectorAll('.listing');
+            let maxPrice = Math.max(...Array.from(listings).map(l => parseFloat(l.dataset.price)));
+
+            // Initialize price range
+            const priceRange = document.getElementById('priceRange');
+            priceRange.max = maxPrice;
+            priceRange.value = maxPrice;
+            document.getElementById('priceValue').textContent = `$0 - $${maxPrice.toFixed(2)}`;
+
             // Filter Elements
             const filters = {
                 material: 'all',
-                price: 5,
+                price: maxPrice,
                 search: '',
                 location: ''
             };
 
-            // DOM Elements
-            const materialOptions = document.querySelectorAll('.material-option');
-            const searchInput = document.getElementById('searchInput');
-            const locationInput = document.getElementById('locationInput');
-            const priceRange = document.getElementById('priceRange');
-            const listings = document.querySelectorAll('.listing');
-
             // Event Listeners
-            materialOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    materialOptions.forEach(opt => opt.classList.remove('active-filter'));
-                    option.classList.add('active-filter');
-                    filters.material = option.dataset.type;
+            document.querySelectorAll('[data-type]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active-filter'));
+                    e.target.classList.add('active-filter');
+                    filters.material = e.target.dataset.type;
                     currentPage = 1;
                     filterAndPaginate();
                 });
@@ -705,19 +614,18 @@
                 filterAndPaginate();
             });
 
-            searchInput.addEventListener('input', (e) => {
+            document.getElementById('searchInput').addEventListener('input', (e) => {
                 filters.search = e.target.value.toLowerCase();
                 currentPage = 1;
                 filterAndPaginate();
             });
 
-            locationInput.addEventListener('input', (e) => {
+            document.getElementById('locationInput').addEventListener('input', (e) => {
                 filters.location = e.target.value.toLowerCase();
                 currentPage = 1;
                 filterAndPaginate();
             });
 
-            // Main Filter Function
             function filterListings() {
                 listings.forEach(listing => {
                     const price = parseFloat(listing.dataset.price);
@@ -725,21 +633,17 @@
                     const title = listing.querySelector('.card-title').textContent.toLowerCase();
                     const location = listing.dataset.location.toLowerCase();
                     
-                    const matchesMaterial = filters.material === 'all' || category === filters.material;
+                    const matchesCategory = filters.material === 'all' || category === filters.material;
                     const matchesPrice = price <= filters.price;
                     const matchesSearch = title.includes(filters.search);
                     const matchesLocation = location.includes(filters.location);
                     
-                    listing.style.display = (matchesMaterial && matchesPrice && matchesSearch && matchesLocation) ? 'block' : 'none';
+                    listing.style.display = (matchesCategory && matchesPrice && matchesSearch && matchesLocation) ? 'block' : 'none';
                 });
             }
 
-            // Pagination Functions
             function updatePagination() {
-                const visibleItems = Array.from(listings).filter(item => 
-                    item.style.display !== 'none'
-                );
-                
+                const visibleItems = Array.from(listings).filter(item => item.style.display !== 'none');
                 const pageCount = Math.ceil(visibleItems.length / itemsPerPage);
                 renderPagination(pageCount);
                 showPageItems(currentPage, visibleItems);
@@ -748,7 +652,6 @@
             function showPageItems(page, items) {
                 const start = (page - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
-                
                 listings.forEach(item => item.style.display = 'none');
                 items.slice(start, end).forEach(item => item.style.display = 'block');
             }
@@ -756,7 +659,6 @@
             function renderPagination(pageCount) {
                 const pagination = document.getElementById('pagination');
                 pagination.innerHTML = '';
-                
                 for (let i = 1; i <= pageCount; i++) {
                     pagination.innerHTML += `
                         <li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -764,7 +666,6 @@
                         </li>
                     `;
                 }
-                
                 document.querySelectorAll('.page-link').forEach(link => {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -774,42 +675,15 @@
                 });
             }
 
-            // Combined Filter and Pagination
             function filterAndPaginate() {
                 filterListings();
                 updatePagination();
             }
 
-            // Modal Handling
-            document.querySelectorAll('.btn-success').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const card = button.closest('.listing-card');
-                    const materialName = card.querySelector('.card-title').textContent;
-                    document.getElementById('buyMaterialName').value = materialName;
-                    new bootstrap.Modal(document.getElementById('buyNowModal')).show();
-                });
-            });
-
             // Initial setup
             filterAndPaginate();
         });
     </script>
-    <script>
-        const authButton = document.getElementById('authButton');
-        const isLoggedIn = localStorage.getItem('ecoToken');
-      
-        if (isLoggedIn) {
-          authButton.textContent = 'Logout';
-          authButton.href = '#';
-          authButton.onclick = () => {
-            localStorage.removeItem('ecoToken');
-            window.location.href = '{{ url_for("login") }}';  // Redirect to login after logout
-          };
-        } else {
-          authButton.textContent = 'Login';
-          authButton.href = '{{ url_for("login") }}';
-        }
-      </script>
-      
+ <!-- Scripts remain the same -->
 </body>
 </html>

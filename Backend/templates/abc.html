@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+       :root {
+            --primary: #2E8B57;
+            --secondary: #3CB371;
+            --accent: #FFD700;
+            --dark: #2F4F4F;
+            --light: #F5FFFA;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .nav-container {
+            background: var(--dark);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            color: var(--light) !important;
+            transition: all 0.3s ease;
+            margin: 0 15px;
+        }
+
+        .nav-link.active {
+            color: var(--accent) !important;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .filter-sidebar {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .material-option {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .material-option:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .price-range {
+            width: 100%;
+        }
+
+        .pagination {
+            margin-top: 30px;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .status-available { background: #28a745; color: white; }
+        .status-ongoing { background: #ffc107; color: black; }
+        .status-soon { background: #17a2b8; color: white; }
+        .status-closed { background: #dc3545; color: white; }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark nav-container">
+        <nav class="navbar navbar-expand-lg navbar-dark nav-container">
+            <div class="container">
+                <a class="navbar-brand" href="home.html">WasteLinkIt
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('marketplace') }}">Marketplace</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('visual') }}">Visual</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact.html">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="cart.html">Your Cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="authButton" class="btn btn-outline-primary" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        <!-- Keep your existing navbar same -->
+    </nav>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="filter-sidebar">
+                    <h4>Filters</h4>
+                    <div class="mb-4">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Location</h6>
+                        <input type="text" class="form-control" id="locationInput" placeholder="Enter location">
+                    </div>
+                    <div class="mb-4">
+                        <h6>Plastic Type</h6>
+                        <div class="list-group">
+                            <button class="list-group-item list-group-item-action active-filter" data-type="all">All Plastics</button>
+                            <button class="list-group-item list-group-item-action" data-type="PET">PET</button>
+                            <button class="list-group-item list-group-item-action" data-type="LDPE">LDPE</button>
+                            <button class="list-group-item list-group-item-action" data-type="PVC">PVC</button>
+                            <button class="list-group-item list-group-item-action" data-type="HDPE">HDPE</button>
+                            <button class="list-group-item list-group-item-action" data-type="PS">PS</button>
+                            <button class="list-group-item list-group-item-action" data-type="PP">PP</button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h6>Price Range</h6>
+                        <input type="range" class="price-range" id="priceRange" min="0" max="10" step="0.1" value="10">
+                        <span id="priceValue">$0 - $10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1>Plastic Marketplace</h1>
+                        <p class="lead">Buy and sell recycled plastic materials</p>
+                    </div>
+                </div>
+
+                <div class="row" id="listings">
+                    <!-- PET Listings -->
+                    <div class="col-md-4 listing" data-price="1.20" data-category="PET" data-location="Texas" data-tons="15" data-status="available">
+                        <div class="card product-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">PET Flakes</h5>
+                                <p class="card-text">Clear recycled PET flakes</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge badge-PET material-badge">PET</span>
+                                    <div class="text-end">
+                                        <span class="text-success">$1.20/kg</span>
+                                        <br>
+                                        <span class="stock-info">15 Tons Available</span>
+                                    </div>
+                                </div>
+                                <div class="status-badge status-available">Available</div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary">Prebook</button>
+                                    <button class="btn btn-success">Buy Now</button>
+                                </div>
+                                <small class="text-muted d-block mt-2">Location: Texas</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LDPE Listing -->
+                    <div class="col-md-4 listing" data-price="0.95" data-category="LDPE" data-location="California" data-tons="8" data-status="available">
+                        <div class="card product-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">LDPE Pellets</h5>
+                                <p class="card-text">High-quality recycled LDPE</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge badge-LDPE material-badge">LDPE</span>
+                                    <div class="text-end">
+                                        <span class="text-success">$0.95/kg</span>
+                                        <br>
+                                        <span class="stock-info">8 Tons Available</span>
+                                    </div>
+                                </div>
+                                <div class="status-badge status-available">Available</div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary">Prebook</button>
+                                    <button class="btn btn-success">Buy Now</button>
+                                </div>
+                                <small class="text-muted d-block mt-2">Location: California</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add more listings for PVC, HDPE, PS, PP following same pattern -->
+                    
+                </div>
+
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center" id="pagination">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const itemsPerPage = 6;
+            let currentPage = 1;
+            const listings = document.querySelectorAll('.listing');
+            let maxPrice = Math.max(...Array.from(listings).map(l => parseFloat(l.dataset.price)));
+
+            // Initialize price range
+            const priceRange = document.getElementById('priceRange');
+            priceRange.max = maxPrice;
+            priceRange.value = maxPrice;
+            document.getElementById('priceValue').textContent = `$0 - $${maxPrice.toFixed(2)}`;
+
+            // Filter Elements
+            const filters = {
+                material: 'all',
+                price: maxPrice,
+                search: '',
+                location: ''
+            };
+
+            // Event Listeners
+            document.querySelectorAll('[data-type]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active-filter'));
+                    e.target.classList.add('active-filter');
+                    filters.material = e.target.dataset.type;
+                    currentPage = 1;
+                    filterAndPaginate();
+                });
+            });
+
+            priceRange.addEventListener('input', (e) => {
+                filters.price = parseFloat(e.target.value);
+                document.getElementById('priceValue').textContent = `$0 - $${filters.price.toFixed(2)}`;
+                currentPage = 1;
+                filterAndPaginate();
+            });
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                filters.search = e.target.value.toLowerCase();
+                currentPage = 1;
+                filterAndPaginate();
+            });
+
+            document.getElementById('locationInput').addEventListener('input', (e) => {
+                filters.location = e.target.value.toLowerCase();
+                currentPage = 1;
+                filterAndPaginate();
+            });
+
+            function filterListings() {
+                listings.forEach(listing => {
+                    const price = parseFloat(listing.dataset.price);
+                    const category = listing.dataset.category;
+                    const title = listing.querySelector('.card-title').textContent.toLowerCase();
+                    const location = listing.dataset.location.toLowerCase();
+                    
+                    const matchesCategory = filters.material === 'all' || category === filters.material;
+                    const matchesPrice = price <= filters.price;
+                    const matchesSearch = title.includes(filters.search);
+                    const matchesLocation = location.includes(filters.location);
+                    
+                    listing.style.display = (matchesCategory && matchesPrice && matchesSearch && matchesLocation) ? 'block' : 'none';
+                });
+            }
+
+            function updatePagination() {
+                const visibleItems = Array.from(listings).filter(item => item.style.display !== 'none');
+                const pageCount = Math.ceil(visibleItems.length / itemsPerPage);
+                renderPagination(pageCount);
+                showPageItems(currentPage, visibleItems);
+            }
+
+            function showPageItems(page, items) {
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                listings.forEach(item => item.style.display = 'none');
+                items.slice(start, end).forEach(item => item.style.display = 'block');
+            }
+
+            function renderPagination(pageCount) {
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                for (let i = 1; i <= pageCount; i++) {
+                    pagination.innerHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+                document.querySelectorAll('.page-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentPage = parseInt(link.dataset.page);
+                        filterAndPaginate();
+                    });
+                });
+            }
+
+            function filterAndPaginate() {
+                filterListings();
+                updatePagination();
+            }
+
+            // Initial setup
+            filterAndPaginate();
+        });
+    </script>
+</body>
+</html>
