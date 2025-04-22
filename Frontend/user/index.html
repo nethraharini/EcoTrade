@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Role-Based Access Portal</title>
+    <style>
+        :root {
+            --primary-color: #339af0;
+            --error-color: #ff6b6b;
+            --success-color: #51cf66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            background-size: cover;
+            filter: brightness(0.7);
+            z-index: -1;
+        }
+
+        /* Role Selection Panel */
+        .role-container {
+            width: 35%;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-right: 1px solid #e9ecef;
+            backdrop-filter: blur(5px);
+        }
+
+        .role-card {
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: white;
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+
+        .role-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.1);
+        }
+
+        .role-card.active {
+            border-color: var(--primary-color);
+            background: #f8fbff;
+            padding-left: 2.5rem;
+        }
+
+        .role-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-color);
+        }
+
+        /* Form Container */
+        .form-container {
+            width: 65%;
+            padding: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(251, 253, 255, 0.95);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 440px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Forms */
+        .form {
+            display: none;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        .form h1 {
+            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .form h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(51, 154, 240, 0.15);
+        }
+
+        input.invalid {
+            border-color: var(--error-color);
+        }
+
+        input.valid {
+            border-color: var(--success-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: #228be6;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .role-container, .form-container {
+                width: 100%;
+                padding: 2rem;
+            }
+
+            .role-container {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .role-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-container {
+                padding: 2rem 1rem;
+            }
+
+            .form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="role-container">
+        <div class="role-card active" data-role="admin" role="button" aria-label="Administrator access">
+            <h2>Administrators</h2>
+            <p>Manage system-wide settings and configurations</p>
+        </div>
+        <div class="role-card" data-role="buyer" role="button" aria-label="Buyer access">
+            <h2>Buyers</h2>
+            <p>Access marketplace and purchase products</p>
+        </div>
+        <div class="role-card" data-role="seller" role="button" aria-label="Seller access">
+            <h2>Sellers</h2>
+            <p>Manage your products and sales</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-wrapper">
+            <!-- Admin Forms -->
+            <div class="form admin-login active" data-role="admin">
+                <h1>Admin Login</h1>
+                <form id="adminLoginForm">
+                    <!-- CSRF Token would go here in production -->
+                    <div class="form-group">
+                        <label for="adminUsername">Username</label>
+                        <input type="text" id="adminUsername" name="username" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" name="password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+
+            <!-- Buyer Forms -->
+            <div class="form buyer-login" data-role="buyer">
+                <h1>Buyer Login</h1>
+                <form id="buyerLoginForm">
+                    <div class="form-group">
+                        <label for="buyerEmail">Email</label>
+                        <input type="email" id="buyerEmail" name="email" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerPassword">Password</label>
+                        <input type="password" id="buyerPassword" name="password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+
+            <!-- Seller Forms -->
+            <div class="form seller-login" data-role="seller">
+                <h1>Seller Login</h1>
+                <form id="sellerLoginForm">
+                    <div class="form-group">
+                        <label for="sellerID">Seller ID</label>
+                        <input type="text" id="sellerID" name="seller_id" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sellerPassword">Password</label>
+                        <input type="password" id="sellerPassword" name="password" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Role Selection
+            const roleCards = document.querySelectorAll('.role-card');
+            const forms = document.querySelectorAll('.form');
+
+            roleCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Update active role
+                    roleCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    
+                    // Show corresponding form
+                    const role = card.dataset.role;
+                    forms.forEach(form => {
+                        form.classList.toggle('active', form.dataset.role === role);
+                    });
+                });
+            });
+
+            // Form Validation
+            const validateEmail = (email) => {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            };
+
+            const showError = (input, message) => {
+                const formGroup = input.closest('.form-group');
+                const error = formGroup.querySelector('.error-message');
+                input.classList.add('invalid');
+                error.textContent = message;
+                error.style.display = 'block';
+            };
+
+            const showSuccess = (input) => {
+                const formGroup = input.closest('.form-group');
+                const error = formGroup.querySelector('.error-message');
+                input.classList.remove('invalid');
+                error.textContent = '';
+                error.style.display = 'none';
+            };
+
+            // Real-time Validation
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.type === 'email') {
+                        validateEmail(e.target.value) 
+                            ? showSuccess(e.target)
+                            : showError(e.target, 'Valid email required');
+                    }
+                    // Add more validation rules as needed
+                });
+            });
+
+            // Form Submission
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // Add your submission logic here
+                    alert('Form submitted successfully!');
+                });
+            });
+
+            // Mobile Optimization
+            const handleResize = () => {
+                if (window.innerWidth < 768) {
+                    document.body.classList.add('mobile');
+                } else {
+                    document.body.classList.remove('mobile');
+                }
+            };
+            window.addEventListener('resize', handleResize);
+            handleResize();
+        });
+    </script>
+</body>
+</html>
