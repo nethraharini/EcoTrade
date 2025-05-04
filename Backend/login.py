@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template, flash, session
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
-import fetchusers  # Import the fetchusers.py module for PDF generation
+import fetchusers  # Make sure this module is in the same folder
 
 app = Flask(__name__)
 app.secret_key = '12345'
@@ -17,12 +17,12 @@ collections = {
     'producers': mongo.db.producers
 }
 
-# Home route
+# Home route (Login Page)
 @app.route('/')
 def index():
-    return render_template('login.html')  # This file must be inside 'templates' folder
+    return render_template('buyer_templates/login.html')
 
-# Login route
+# Login POST route
 @app.route('/login', methods=['POST'])
 def login():
     role = request.form.get('role')
@@ -36,6 +36,7 @@ def login():
             session['role'] = role
             flash(f'Welcome back, {username}!', 'success')
             return redirect(f'/{role}_dashboard')
+
     flash('Invalid credentials for selected role.', 'error')
     return redirect('/')
 
@@ -63,74 +64,65 @@ def signup():
             'password': hashed_password
         })
         flash('Account created successfully! Please log in.', 'success')
-
-        # Call the function to regenerate the PDF after signup
-        fetchusers.fetch_and_generate_pdf()  # Regenerate the report
-
+        fetchusers.fetch_and_generate_pdf()
     else:
         flash('Invalid role.', 'error')
 
     return redirect('/home')
 
+# Home Page after login
 @app.route('/home')
 def home():
     if 'username' in session:
-        return render_template('home.html', username=session['username'], role=session['role'])
-    else:
-        flash('Please log in first.', 'error')
-        return redirect('/')
+        return render_template('buyer_templates/home.html', username=session['username'], role=session['role'])
+    flash('Please log in first.', 'error')
+    return redirect('/')
 
-
-
-# Dashboard routes
+# Dashboards
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if 'username' in session:
-        return render_template('home.html', username=session['username'])
+        return render_template('buyer_templates/home.html', username=session['username'])
     return redirect('/')
 
 @app.route('/buyer_dashboard')
 def buyer_dashboard():
     if 'username' in session:
-        return render_template('home.html', username=session['username'])
-
+        return render_template('buyer_templates/home.html', username=session['username'])
     return redirect('/')
 
 @app.route('/seller_dashboard')
 def seller_dashboard():
     if 'username' in session:
-        return render_template('home.html', username=session['username'])
+        return render_template('buyer_templates/home.html', username=session['username'])
     return redirect('/')
 
+# Marketplace Page
 @app.route('/marketplace')
 def marketplace():
     if 'username' in session:
-        return render_template('marketplace.html', username=session['username'])
-    else:
-        flash('Please log in first.', 'error')
-        return redirect('/')
+        return render_template('buyer_templates/marketplace.html', username=session['username'])
+    flash('Please log in first.', 'error')
+    return redirect('/')
 
+# Visual Page
 @app.route('/visual')
 def visual():
     if 'username' in session:
-        return render_template('visual.html', username=session['username'])
-    else:
-        flash('Please log in first.', 'error')
-        return redirect('/')
+        return render_template('buyer_templates/visual.html', username=session['username'])
+    flash('Please log in first.', 'error')
+    return redirect('/')
 
-
-@app.route('/login')
-def login_():
-    return render_template('login.html')
-
-
+# TN Visualization
 @app.route('/tn_visualization')
 def tn_visualization():
-    return render_template('TN_visualization.html')
+    return render_template('buyer_templates/TN_visualization.html')
 
+# Separate login GET (in case needed)
+@app.route('/login')
+def login_():
+    return render_template('buyer_templates/login.html')
 
-
-
-# Run the app
+# Run Flask App
 if __name__ == '__main__':
     app.run(debug=True)
